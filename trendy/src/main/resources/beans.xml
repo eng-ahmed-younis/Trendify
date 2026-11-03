@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Manger Bean -->
+    <bean id="manger" class="com.shop.trendy.models.Manger">
+        <property name="name" value="Ahmed" />
+        <property name="age" value="35" />
+    </bean>
+
+    <!-- Employee Bean (Constructor Injection referencing manger) -->
+    <bean id="employee" class="com.shop.trendy.models.Employee">
+        <constructor-arg ref="manger" />
+    </bean>
+
+</beans>
