@@ -5,17 +5,34 @@
            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- ======================================================== -->
-    <!-- CASE 1: Standard Bean with Setter Injection (Primitives) -->
+    <!-- BeanPostProcessor (Runs before & after init on ALL beans)-->
+    <!-- ======================================================== -->
+    <bean id="customBeanPostProcessor" class="com.shop.trendy.models.CustomBeanPostProcessor" />
+
+    <!-- ======================================================== -->
+    <!-- CASE 1: Standard Bean with Setter Injection              -->
     <!-- ======================================================== -->
     <bean id="manger" class="com.shop.trendy.models.Manger">
         <property name="name" value="Ahmed" />
         <property name="age" value="35" />
     </bean>
 
-    <!-- Another Manager instance (Prototype Scope example) -->
-    <bean id="assistantManager" class="com.shop.trendy.models.Manger" scope="prototype">
+    <bean id="assistantManager" class="com.shop.trendy.models.Manger">
         <property name="name" value="Sarah" />
         <property name="age" value="28" />
+    </bean>
+
+    <!-- ======================================================== -->
+    <!-- BEAN SCOPES: SINGLETON vs PROTOTYPE                      -->
+    <!-- ======================================================== -->
+    <bean id="singletonBranch" class="com.shop.trendy.models.Branch" scope="singleton">
+        <property name="branchName" value="Cairo Main Branch" />
+        <property name="city" value="Cairo" />
+    </bean>
+
+    <bean id="prototypeBranch" class="com.shop.trendy.models.Branch" scope="prototype">
+        <property name="branchName" value="Alexandria Express Branch" />
+        <property name="city" value="Alexandria" />
     </bean>
 
     <!-- ======================================================== -->
@@ -30,20 +47,23 @@
     </bean>
 
     <!-- ======================================================== -->
-    <!-- CASE 3: ALL COLLECTION TYPES & SPECIAL CASES             -->
+    <!-- CASE 3: Department with Full Lifecycle & Collections      -->
     <!-- ======================================================== -->
     <bean id="department" class="com.shop.trendy.models.Department" 
-          init-method="init" 
-          destroy-method="destroy">
+          init-method="customInit" 
+          destroy-method="customDestroy"
+          scope="singleton">
 
-        <!-- 3.1: Simple values / Literals -->
+        <!-- Simple values / Literals (including branchName) -->
         <property name="departmentName" value="Information Technology" />
+        <property name="branchName" value="Nasr City Branch" />
         <property name="budget" value="150000.50" />
 
-        <!-- 3.2: Reference to another existing Bean -->
+        <!-- Reference to another existing Bean -->
         <property name="manager" ref="manger" />
+        <property name="branch" ref="singletonBranch" />
 
-        <!-- 3.3: List of simple values (Strings) -->
+        <!-- List of simple values (Strings) -->
         <property name="tasks">
             <list>
                 <value>System Maintenance</value>
@@ -52,12 +72,12 @@
             </list>
         </property>
 
-        <!-- 3.4: List of Bean References -->
+        <!-- List of Bean References & Inner Bean -->
         <property name="employees">
             <list>
                 <ref bean="employee1" />
                 <ref bean="employee2" />
-                <!-- 3.5: Inner Bean (defined directly inside the list) -->
+                <!-- Inner Bean -->
                 <bean class="com.shop.trendy.models.Employee">
                     <constructor-arg>
                         <bean class="com.shop.trendy.models.Manger">
@@ -69,7 +89,7 @@
             </list>
         </property>
 
-        <!-- 3.6: Set of unique values (duplicates automatically eliminated) -->
+        <!-- Set of unique values -->
         <property name="locations">
             <set>
                 <value>Cairo</value>
@@ -78,7 +98,7 @@
             </set>
         </property>
 
-        <!-- 3.7: Map of key-value pairs -->
+        <!-- Map of key-value pairs -->
         <property name="contactDetails">
             <map>
                 <entry key="email" value="it-dept@trendy.com" />
@@ -87,7 +107,7 @@
             </map>
         </property>
 
-        <!-- 3.8: Properties (key-value strings typically for configuration) -->
+        <!-- Properties (key-value strings) -->
         <property name="configSettings">
             <props>
                 <prop key="server.timeout">5000</prop>
@@ -101,9 +121,10 @@
     <!-- ======================================================== -->
     <!-- CASE 4: Constructor Injection by Index and Type          -->
     <!-- ======================================================== -->
-    <bean id="hrDepartment" class="com.shop.trendy.models.Department">
+    <bean id="hrDepartment" class="com.shop.trendy.models.Department" scope="prototype">
         <constructor-arg index="0" type="java.lang.String" value="Human Resources" />
         <constructor-arg index="1" type="double" value="75000.0" />
+        <property name="branchName" value="Maadi Branch" />
         <!-- Setting a property explicitly to null -->
         <property name="manager">
             <null />
