@@ -4,15 +4,110 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <!-- Manger Bean -->
+    <!-- ======================================================== -->
+    <!-- CASE 1: Standard Bean with Setter Injection (Primitives) -->
+    <!-- ======================================================== -->
     <bean id="manger" class="com.shop.trendy.models.Manger">
         <property name="name" value="Ahmed" />
         <property name="age" value="35" />
     </bean>
 
-    <!-- Employee Bean (Constructor Injection referencing manger) -->
-    <bean id="employee" class="com.shop.trendy.models.Employee">
+    <!-- Another Manager instance (Prototype Scope example) -->
+    <bean id="assistantManager" class="com.shop.trendy.models.Manger" scope="prototype">
+        <property name="name" value="Sarah" />
+        <property name="age" value="28" />
+    </bean>
+
+    <!-- ======================================================== -->
+    <!-- CASE 2: Constructor Injection                            -->
+    <!-- ======================================================== -->
+    <bean id="employee1" class="com.shop.trendy.models.Employee">
         <constructor-arg ref="manger" />
+    </bean>
+
+    <bean id="employee2" class="com.shop.trendy.models.Employee">
+        <constructor-arg ref="assistantManager" />
+    </bean>
+
+    <!-- ======================================================== -->
+    <!-- CASE 3: ALL COLLECTION TYPES & SPECIAL CASES             -->
+    <!-- ======================================================== -->
+    <bean id="department" class="com.shop.trendy.models.Department" 
+          init-method="init" 
+          destroy-method="destroy">
+
+        <!-- 3.1: Simple values / Literals -->
+        <property name="departmentName" value="Information Technology" />
+        <property name="budget" value="150000.50" />
+
+        <!-- 3.2: Reference to another existing Bean -->
+        <property name="manager" ref="manger" />
+
+        <!-- 3.3: List of simple values (Strings) -->
+        <property name="tasks">
+            <list>
+                <value>System Maintenance</value>
+                <value>Database Migration</value>
+                <value>Spring Framework Upgrade</value>
+            </list>
+        </property>
+
+        <!-- 3.4: List of Bean References -->
+        <property name="employees">
+            <list>
+                <ref bean="employee1" />
+                <ref bean="employee2" />
+                <!-- 3.5: Inner Bean (defined directly inside the list) -->
+                <bean class="com.shop.trendy.models.Employee">
+                    <constructor-arg>
+                        <bean class="com.shop.trendy.models.Manger">
+                            <property name="name" value="Temporary Manager" />
+                            <property name="age" value="40" />
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </property>
+
+        <!-- 3.6: Set of unique values (duplicates automatically eliminated) -->
+        <property name="locations">
+            <set>
+                <value>Cairo</value>
+                <value>Alexandria</value>
+                <value>Giza</value>
+            </set>
+        </property>
+
+        <!-- 3.7: Map of key-value pairs -->
+        <property name="contactDetails">
+            <map>
+                <entry key="email" value="it-dept@trendy.com" />
+                <entry key="phone" value="+20123456789" />
+                <entry key="supportDesk" value="Room 402" />
+            </map>
+        </property>
+
+        <!-- 3.8: Properties (key-value strings typically for configuration) -->
+        <property name="configSettings">
+            <props>
+                <prop key="server.timeout">5000</prop>
+                <prop key="max.connections">100</prop>
+                <prop key="debug.mode">true</prop>
+            </props>
+        </property>
+
+    </bean>
+
+    <!-- ======================================================== -->
+    <!-- CASE 4: Constructor Injection by Index and Type          -->
+    <!-- ======================================================== -->
+    <bean id="hrDepartment" class="com.shop.trendy.models.Department">
+        <constructor-arg index="0" type="java.lang.String" value="Human Resources" />
+        <constructor-arg index="1" type="double" value="75000.0" />
+        <!-- Setting a property explicitly to null -->
+        <property name="manager">
+            <null />
+        </property>
     </bean>
 
 </beans>
